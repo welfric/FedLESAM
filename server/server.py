@@ -100,11 +100,11 @@ class Server(object):
             print("  Targeted Test   ----    Loss: {:.4f},   Accuracy: {:.4f}".format(self.train_perf[t][0], self.train_perf[t][1]), flush = True)
             #loss, acc = self._validate_(testdataset)
             self.test_perf[t] = [loss, acc]
-            if acc>self.best:
-                self.best=acc
-                #torch
-                name='/mnt/workspace/zqfan/'+self.args.method+'.pt'
-                torch.save(self.server_model.state_dict(),name)
+            # if acc>self.best:
+            #     self.best=acc
+            #     #torch
+            #     name='/mnt/workspace/zqfan/'+self.args.method+'.pt'
+            #     torch.save(self.server_model.state_dict(),name)
             # validation on test set
             #loss, acc = self._validate_(testdataset)
             #self.test_perf[t] = [loss, acc]
@@ -125,15 +125,15 @@ class Server(object):
             loss, acc = self._validate_(testdataset)
             self.test_perf[t] = [loss, acc]
             print("    Test    ----    Loss: {:.4f},   Accuracy: {:.4f}".format(self.test_perf[t][0], self.test_perf[t][1]), flush = True)
-            if acc>self.best:
-                self.best=acc
-                #torch
-                name='/mnt/workspace/zqfan/'+self.args.method+'_best.pt'
-                torch.save(self.server_model.state_dict(),name)
-            if t%5==0:
+            # if acc>self.best:
+            #     self.best=acc
+            #     #torch
+            #     name='/mnt/workspace/zqfan/'+self.args.method+'_best.pt'
+            #     torch.save(self.server_model.state_dict(),name)
+            # if t%5==0:
 
-                name='/mnt/workspace/zqfan/modelsave/'+self.args.method+"_"+str(t)+'.pt'
-                torch.save(self.server_model.state_dict(),name)
+            #     name='/mnt/workspace/zqfan/modelsave/'+self.args.method+"_"+str(t)+'.pt'
+            #     torch.save(self.server_model.state_dict(),name)
             # calculate consistency
             self._see_the_divergence_(selected_clients, t)
             print("            ----    Divergence: {:.4f}".format(self.divergence[t]), flush = True)
@@ -334,5 +334,5 @@ class Server(object):
     
             
         
-        self._save_results_()
+        # self._save_results_()
         self._summary_()
