@@ -27,7 +27,7 @@ parser.add_argument('--split-coef', default=0.1, type=float)                    
                                                                                                              # --> if Pathological: select the Dirichlet coefficient (i.e. 3, 5)
 parser.add_argument('--active-ratio', default=0.05, type=float)                                              # select the partial participating ratio (i.e. 0.1, 0.05)
 parser.add_argument('--total-client', default=200, type=int)                                               # select the total number of clients (i.e. 100, 500)
-parser.add_argument('--comm-rounds', default=1000, type=int)                                               # select the global communication rounds T
+parser.add_argument('--comm-rounds', default=100, type=int)                                               # select the global communication rounds T
 parser.add_argument('--local-epochs', default=5, type=int)                                                 # select the local interval K
 parser.add_argument('--batchsize', default=25, type=int)                                                   # select the batchsize
 parser.add_argument('--weight-decay', default=0.001, type=float)                                           # select the weight-decay (i.e. 0.01, 0.001)
@@ -105,6 +105,8 @@ if __name__=='__main__':
         server_func = FedLESAM_S
     elif args.method == 'FedLESAM_D':
         server_func = FedLESAM_D
+    elif args.method == 'FedSAMT':
+        server_func = FedSAMTemp
     else:
         raise NotImplementedError('not implemented method yet')
     
