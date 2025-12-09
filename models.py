@@ -71,7 +71,7 @@ class client_model(nn.Module):
             
         if self.name == 'ResNet18':
             resnet18 = models.resnet18()
-            resnet18.fc = nn.Linear(512, 10)
+            resnet18.fc = nn.Identity()
 
             # Change BN to GN 
             resnet18.bn1 = nn.GroupNorm(num_groups = 2, num_channels = 64)
@@ -102,6 +102,8 @@ class client_model(nn.Module):
             assert len(dict(resnet18.named_parameters()).keys()) == len(resnet18.state_dict().keys()), 'More BN layers are there...'
             
             self.model = resnet18
+            self.fc = nn.Linear(512, 10)
+
         if self.name == 'ResNet18_100':
             resnet18 = models.resnet18()
             resnet18.fc = nn.Linear(512, 100)
@@ -135,7 +137,8 @@ class client_model(nn.Module):
             assert len(dict(resnet18.named_parameters()).keys()) == len(resnet18.state_dict().keys()), 'More BN layers are there...'
             
             self.model = resnet18
-    def forward(self, x):
+
+    def forward(self, x, return_feats = False):
 
         if self.name == 'Linear':
             x = self.fc(x)
@@ -161,7 +164,11 @@ class client_model(nn.Module):
             x = self.fc3(x)
             
         if self.name in ['ResNet18',"ResNet18_100"]:
-            x = self.model(x)
+            feats = self.model(x)
+            x = self.fc(feats)
+            if return_feats:
+                return feats, x
+            return x
             #print(x)
         if self.name in ["ResNet18P"]:
             x=self.model(x)

@@ -69,7 +69,7 @@ class fedsam_temp(Client):
         self.temp_opt.zero_grad()
 
         # Step 1: Forward at w and compute gradient
-        feats, logits = self.model(inputs)
+        feats, logits = self.model(inputs, return_feats=True)
         # Detach features when computing loss for the first gradient to prevent 
         # TempNet from influencing the first-step gradient calculation for SAM.
         tau = self.tempnet(feats.detach()) 
@@ -115,7 +115,7 @@ class fedsam_temp(Client):
         self.temp_opt.zero_grad()
         
         # Forward pass on perturbed model
-        feats_pert, logits_pert = self.model(inputs)
+        feats_pert, logits_pert = self.model(inputs, return_feats=True)
         
         # Calculate loss for second gradient
         # Note: We now allow the gradient to flow back through TempNet if needed,
