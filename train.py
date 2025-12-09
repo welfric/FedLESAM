@@ -107,6 +107,8 @@ if __name__=='__main__':
         server_func = FedLESAM_D
     elif args.method == 'FedSAMT':
         server_func = FedSAMTemp
+    elif args.method == 'FedLESAMTemp':
+        server_func = FedLESAMTemp
     else:
         raise NotImplementedError('not implemented method yet')
     

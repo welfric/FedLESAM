@@ -10,3 +10,4 @@ from .FedLESAM import FedLESAM
 from .FedLESAM_S import FedLESAM_S
 from .FedLESAM_D import FedLESAM_D
 from .FedSAMT import FedSAMTemp
+from .FedLESAMTemp import FedLESAMTemp
