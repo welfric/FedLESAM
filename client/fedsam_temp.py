@@ -6,7 +6,7 @@ from dataset import Dataset # Keep if needed for type hints, otherwise remove
 from torch.utils import data
 from tqdm import tqdm
 from time import time
-from client import *
+from client import Client
 
 # Assume TempNet and SimpleCNN models are accessible (e.g., imported from models)
 # Placeholder for TempNet (you should use your actual TempNet definition)
