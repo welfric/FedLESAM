@@ -51,7 +51,7 @@ parser.add_argument('--gamma', default=1.0, type=float)                         
 parser.add_argument('--epsilon', default=0.01, type=float)                                                 # select the minimal value for avoiding zero-division
 
 parser.add_argument('--method', choices=['FedAvg', 'FedCM', 'FedDyn', 'SCAFFOLD', 'FedAdam', 'FedProx', 'FedSAM', 'MoFedSAM', \
-                                         'FedSpeed','FedLESAM','FedGAMMA','FedLESAM_S','FedLESAM_D', 'FedSAMT'], type=str, default='FedAvg')
+                                         'FedSpeed','FedLESAM','FedGAMMA','FedLESAM_S','FedLESAM_D', 'FedSAMT', 'FedLESAMTemp'], type=str, default='FedAvg')
                                          
 args = parser.parse_args()
 # print(args)
