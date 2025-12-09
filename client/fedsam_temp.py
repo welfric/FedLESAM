@@ -53,7 +53,6 @@ class fedsam_temp(Client):
         
         # The base client's self.loss (CrossEntropyLoss) will be used.
         
-    @torch.no_grad()
     def _compute_perturbation_and_ascent(self, inputs, labels):
         """
         Executes the first SAM step: 
