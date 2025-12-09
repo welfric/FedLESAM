@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--mode', choices=['normal'], type=str, default='normal')
 parser.add_argument('--dataset', choices=['CIFAR10', 'CIFAR100'], type=str, default='CIFAR10')             # select dataset
 parser.add_argument('--model', choices=['ResNet18','ResNet18P','ResNet18_100'], type=str, default='ResNet18')                    # select model
-parser.add_argument('--non-iid', action='store_true', default=False)                                       # activate if use heterogeneous dataset 
+parser.add_argument('--non-iid', action='store_true', default=True)                                       # activate if use heterogeneous dataset 
 parser.add_argument('--split-rule',default='Dirichlet')  # select the dataset splitting rule
 parser.add_argument('--split-coef', default=0.1, type=float)                                                 # --> if Dirichlet: select the Dirichlet coefficient (i.e. 0.1, 0.3, 0.6, 1)
                                                                                                              # --> if Pathological: select the Dirichlet coefficient (i.e. 3, 5)
