@@ -6,7 +6,7 @@ from time import time
 import copy
 
 
-# Placeholder for TempNet (you should use your actual TempNet definition)
+# TempNet for adaptive temperature scaling
 class TempNet(torch.nn.Module):
     def __init__(self, feature_dim=512, hidden_dim=128, tau_min=0.05, tau_max=2.0):
         super().__init__()
@@ -29,10 +29,20 @@ class fedgmtt(Client):
             device, model_func, received_vecs, dataset, lr, args
         )
 
-        # 1. TempNet Setup
-        self.tempnet = TempNet().to(self.device)
+        # TempNet Setup
+        feature_dim = args.feature_dim if hasattr(args, "feature_dim") else 512
+        hidden_dim = args.temp_hidden_dim if hasattr(args, "temp_hidden_dim") else 128
+        tau_min = args.tau_min if hasattr(args, "tau_min") else 0.05
+        tau_max = args.tau_max if hasattr(args, "tau_max") else 2.0
+        
+        self.tempnet = TempNet(
+            feature_dim=feature_dim,
+            hidden_dim=hidden_dim,
+            tau_min=tau_min,
+            tau_max=tau_max
+        ).to(self.device)
 
-        # 2. TempNet Optimizer
+        # TempNet Optimizer
         self.temp_opt = torch.optim.SGD(self.tempnet.parameters(), lr=lr)
 
         # FedGMT specific parameters
@@ -44,7 +54,7 @@ class fedgmtt(Client):
         self.dual_variable = None
 
     def train(self):
-        # local training with FedGMT + TempNet
+        # Local training with FedGMT + TempNet
         self.model.train()
         self.tempnet.train()
 
@@ -67,7 +77,17 @@ class fedgmtt(Client):
                     output_ema = self.EMA(inputs) if self.EMA is not None else None
 
                 # Forward pass with main model - extract features
-                feats, logits = self.model(inputs, return_feats=True)
+                # Check if model supports return_feats
+                if hasattr(self.model, 'return_feats') or 'return_feats' in str(type(self.model)):
+                    try:
+                        feats, logits = self.model(inputs, return_feats=True)
+                    except:
+                        # Fallback: use logits as features
+                        logits = self.model(inputs)
+                        feats = logits.detach()
+                else:
+                    logits = self.model(inputs)
+                    feats = logits.detach()
 
                 # Get temperature scaling from TempNet
                 tau_temp = self.tempnet(feats.detach())
@@ -79,7 +99,7 @@ class fedgmtt(Client):
                 loss_main = self.loss(scaled_logits, labels)
 
                 # Knowledge distillation loss (GMT loss) using EMA model
-                if self.EMA is not None:
+                if self.EMA is not None and output_ema is not None:
                     pred_probs = F.log_softmax(scaled_logits / self.tau, dim=1)
                     ema_probs = torch.softmax(output_ema / self.tau, dim=1)
                     loss_kl = (
@@ -92,7 +112,9 @@ class fedgmtt(Client):
                 # Dual variable correction (DYN-style)
                 if self.dual_variable is not None:
                     local_params = param_to_vector(self.model)
-                    loss -= torch.dot(local_params, (-self.beta) * self.dual_variable)
+                    # Ensure dual_variable is on the same device
+                    dual_var = self.dual_variable.to(self.device)
+                    loss -= torch.dot(local_params, (-self.beta) * dual_var)
 
                 self.optimizer.zero_grad()
                 self.temp_opt.zero_grad()
@@ -101,6 +123,9 @@ class fedgmtt(Client):
                 # Clip gradients to prevent exploding
                 torch.nn.utils.clip_grad_norm_(
                     parameters=self.model.parameters(), max_norm=self.max_norm
+                )
+                torch.nn.utils.clip_grad_norm_(
+                    parameters=self.tempnet.parameters(), max_norm=self.max_norm
                 )
 
                 self.optimizer.step()
@@ -113,7 +138,7 @@ class fedgmtt(Client):
         )
         self.comm_vecs["local_model_param_list"] = last_state_params_list
 
-        # Store for server synchronization
+        # Store local update for server synchronization
         with torch.no_grad():
             local_params = param_to_vector(self.model).detach()
             self.local_update = local_params - regular_params

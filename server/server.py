@@ -397,9 +397,9 @@ class Server(object):
                     lr=self.lr,
                     args=self.args,
                 )
-                # Send EMA model if server has it (for FedGMT/FedGMTT)
-                if hasattr(self, "send_ema_to_client"):
-                    self.send_ema_to_client(_edge_device, client)
+                # # Send EMA model if server has it (for FedGMT/FedGMTT)
+                # if hasattr(self, "send_ema_to_client"):
+                #     self.send_ema_to_client(_edge_device, client)
                 self.received_vecs = _edge_device.train()
                 self.clients_updated_params_list[client] = self.received_vecs[
                     "local_update_list"

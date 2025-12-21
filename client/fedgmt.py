@@ -21,7 +21,7 @@ class fedgmt(Client):
         self.dual_variable = None
 
     def train(self):
-        # local training with FedGMT
+        # Local training with FedGMT
         self.model.train()
 
         # Disable gradients for EMA model
@@ -43,14 +43,14 @@ class fedgmt(Client):
                     output_ema = self.EMA(inputs) if self.EMA is not None else None
 
                 # Forward pass with main model
-                predictions = self.model(inputs)
+                output = self.model(inputs)
 
                 # Main task loss
-                loss_main = self.loss(predictions, labels)
+                loss_main = self.loss(output, labels)
 
                 # Knowledge distillation loss (GMT loss) using EMA model
-                if self.EMA is not None:
-                    pred_probs = F.log_softmax(predictions / self.tau, dim=1)
+                if self.EMA is not None and output_ema is not None:
+                    pred_probs = F.log_softmax(output / self.tau, dim=1)
                     ema_probs = torch.softmax(output_ema / self.tau, dim=1)
                     loss_kl = (
                         self.gama * (self.tau**2) * self.KLDiv(pred_probs, ema_probs)
@@ -62,7 +62,9 @@ class fedgmt(Client):
                 # Dual variable correction (DYN-style)
                 if self.dual_variable is not None:
                     local_params = param_to_vector(self.model)
-                    loss -= torch.dot(local_params, (-self.beta) * self.dual_variable)
+                    # Ensure dual_variable is on the same device
+                    dual_var = self.dual_variable.to(self.device)
+                    loss -= torch.dot(local_params, (-self.beta) * dual_var)
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -71,6 +73,7 @@ class fedgmt(Client):
                 torch.nn.utils.clip_grad_norm_(
                     parameters=self.model.parameters(), max_norm=self.max_norm
                 )
+
                 self.optimizer.step()
 
         # Prepare communication vectors
@@ -80,7 +83,7 @@ class fedgmt(Client):
         )
         self.comm_vecs["local_model_param_list"] = last_state_params_list
 
-        # Store for server synchronization
+        # Store local update for server synchronization
         with torch.no_grad():
             local_params = param_to_vector(self.model).detach()
             self.local_update = local_params - regular_params
