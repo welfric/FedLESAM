@@ -112,8 +112,10 @@ parser.add_argument(
         "FedCM",
         "FedDyn",
         "SCAFFOLD",
+        "SCAFFOLDT",
         "FedAdam",
         "FedProx",
+        "FedProxT",
         "FedSAM",
         "MoFedSAM",
         "FedSpeed",
@@ -194,10 +196,14 @@ if __name__ == "__main__":
         server_func = FedDyn
     elif args.method == "SCAFFOLD":
         server_func = SCAFFOLD
+    elif args.method == "SCAFFOLDT":
+        server_func = SCAFFOLDT
     elif args.method == "FedAdam":
         server_func = FedAdam
     elif args.method == "FedProx":
         server_func = FedProx
+    elif args.method == "FedProxT":
+        server_func = FedProxT
     elif args.method == "FedSAM":
         server_func = FedSAM
     elif args.method == "MoFedSAM":

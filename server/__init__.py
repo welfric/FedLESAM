@@ -12,3 +12,5 @@ from .FedLESAM_D import FedLESAM_D
 from .FedSAMT import FedSAMTemp
 from .FedLESAMTemp import FedLESAMTemp
 from .FedAvgT import FedAvgT
+from .FedProxT import FedProxT
+from .SCAFFOLDT import SCAFFOLDT

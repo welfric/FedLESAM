@@ -12,3 +12,5 @@ from .fedlesam_d import fedlesam_d
 from .fedsam_temp import fedsam_temp
 from .fedlesam_temp import fedlesam_temp
 from .fedavgt import fedavgt
+from .fedproxt import fedproxt
+from .scaffoldt import scaffoldt
