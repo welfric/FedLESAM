@@ -25,7 +25,7 @@ parser.add_argument(
 )  # select dataset
 parser.add_argument(
     "--model",
-    choices=["ResNet18", "ResNet18P", "ResNet18_100"],
+    choices=["ResNet18", "ResNet18P", "ResNet18_100", "SimpleCNN", "SimpleCNN_100"],
     type=str,
     default="ResNet18",
 )  # select model
