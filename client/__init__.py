@@ -11,3 +11,4 @@ from .fedlesam_s import fedlesam_s
 from .fedlesam_d import fedlesam_d
 from .fedsam_temp import fedsam_temp
 from .fedlesam_temp import fedlesam_temp
+from .fedavgt import fedavgt
