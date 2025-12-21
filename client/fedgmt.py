@@ -79,7 +79,7 @@ class fedgmt(Client):
         # Prepare communication vectors
         last_state_params_list = get_mdl_params(self.model)
         self.comm_vecs["local_update_list"] = (
-            last_state_params_list - self.received_vecs["Params_list"]
+            last_state_params_list - self.received_vecs["Params_list"].to(self.device)
         )
         self.comm_vecs["local_model_param_list"] = last_state_params_list
 
