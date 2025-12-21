@@ -54,27 +54,58 @@ class FedGMT(Server):
             self.dual_variable_list[client] + local_update
         )
 
+    # def global_update(self, selected_clients, Averaged_update, Averaged_model):
+    #     """FedGMT global update with EMA model and dual variable aggregation"""
+    #     # Ensure all tensors are on the correct device
+    #     Averaged_update = Averaged_update.to(self.device)
+        
+    #     # Apply dual variable correction (average over selected clients)
+    #     dual_correction = torch.mean(
+    #         self.dual_variable_list[selected_clients], dim=0
+    #     )
+
+    #     # w(t+1) = w(t) + eta_g * Delta + dual_correction
+    #     new_params = (
+    #         self.server_model_params_list
+    #         + self.args.global_learning_rate * Averaged_update
+    #         + dual_correction
+    #     )
+
+    #     # Update EMA model: EMA = EMA * alpha + global * (1 - alpha)
+    #     with torch.no_grad():
+    #         ema_params = param_to_vector(self.EMA_model)
+    #         ema_params = ema_params * self.alpha + new_params * (1 - self.alpha)
+    #         set_client_from_params(self.device, self.EMA_model, ema_params)
+
+    #     return new_params
     def global_update(self, selected_clients, Averaged_update, Averaged_model):
-        """FedGMT global update with EMA model and dual variable aggregation"""
-        # Ensure all tensors are on the correct device
+        """FedGMT/T global update with device safety"""
+        # 1. Ensure the inputs are on the correct device
         Averaged_update = Averaged_update.to(self.device)
         
-        # Apply dual variable correction (average over selected clients)
+        # 2. Explicitly move the server's parameter tensor to the device
+        # This is likely the "cpu" tensor causing your error
+        server_params = self.server_model_params_list.to(self.device)
+
+        # 3. Apply dual variable correction
         dual_correction = torch.mean(
             self.dual_variable_list[selected_clients], dim=0
-        )
+        ).to(self.device)
 
+        # 4. Perform the update
         # w(t+1) = w(t) + eta_g * Delta + dual_correction
         new_params = (
-            self.server_model_params_list
+            server_params
             + self.args.global_learning_rate * Averaged_update
             + dual_correction
         )
 
-        # Update EMA model: EMA = EMA * alpha + global * (1 - alpha)
+        # Update EMA model
         with torch.no_grad():
             ema_params = param_to_vector(self.EMA_model)
             ema_params = ema_params * self.alpha + new_params * (1 - self.alpha)
             set_client_from_params(self.device, self.EMA_model, ema_params)
 
-        return new_params
+        # IMPORTANT: If your framework expects the server list to stay on CPU, 
+        # move it back, otherwise just return new_params
+        return new_params.cpu() if self.server_model_params_list.device == torch.device('cpu') else new_params
