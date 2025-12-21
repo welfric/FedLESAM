@@ -44,12 +44,14 @@ class FedGMTT(Server):
     def global_update(self, selected_clients, Averaged_update, Averaged_model):
         # FedGMT with TempNet (ServerOpt) with EMA model update and dual variable aggregation
         # Apply dual variable correction
-        dual_correction = torch.mean(self.dual_variable_list[selected_clients], dim=0)
+        dual_correction = torch.mean(
+            self.dual_variable_list[selected_clients], dim=0
+        ).to(self.device)
 
         # w(t+1) = w(t) + eta_g * Delta + dual_correction
         new_params = (
-            self.server_model_params_list
-            + self.args.global_learning_rate * Averaged_update
+            self.server_model_params_list.to(self.device)
+            + self.args.global_learning_rate * Averaged_update.to(self.device)
             + dual_correction
         )
 
