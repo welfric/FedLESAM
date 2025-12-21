@@ -14,3 +14,7 @@ from .FedLESAMTemp import FedLESAMTemp
 from .FedAvgT import FedAvgT
 from .FedProxT import FedProxT
 from .SCAFFOLDT import SCAFFOLDT
+from .FedSMOO import FedSMOO
+from .FedSMOOT import FedSMOOT
+from .FedGMT import FedGMT
+from .FedGMTT import FedGMTT

@@ -125,6 +125,10 @@ parser.add_argument(
         "FedLESAM_D",
         "FedSAMT",
         "FedLESAMTemp",
+        "FedSMOO",
+        "FedSMOOT",
+        "FedGMT",
+        "FedGMTT",
     ],
     type=str,
     default="FedAvg",
@@ -218,6 +222,14 @@ if __name__ == "__main__":
         server_func = FedSAMTemp
     elif args.method == "FedLESAMTemp":
         server_func = FedLESAMTemp
+    elif args.method == "FedSMOO":
+        server_func = FedSMOO
+    elif args.method == "FedSMOOT":
+        server_func = FedSMOOT
+    elif args.method == "FedGMT":
+        server_func = FedGMT
+    elif args.method == "FedGMTT":
+        server_func = FedGMTT
     else:
         raise NotImplementedError("not implemented method yet")
 

@@ -14,3 +14,7 @@ from .fedlesam_temp import fedlesam_temp
 from .fedavgt import fedavgt
 from .fedproxt import fedproxt
 from .scaffoldt import scaffoldt
+from .fedsmoot import fedsmoot
+from .fedsmoo import fedsmoo
+from .fedgmt import fedgmt
+from .fedgmtt import fedgmtt
