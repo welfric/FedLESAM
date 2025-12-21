@@ -55,7 +55,7 @@ class FedGMT(Server):
 
         # Update EMA model: EMA = EMA * alpha + global * (1 - alpha)
         with torch.no_grad():
-            ema_params = param_to_vector(self.EMA_model)
+            ema_params = param_to_vector(self.EMA_model).to(self.device)
             ema_params = ema_params * self.alpha + new_params * (1 - self.alpha)
             set_client_from_params(self.device, self.EMA_model, ema_params)
 
