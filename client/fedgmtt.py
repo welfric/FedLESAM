@@ -76,18 +76,8 @@ class fedgmtt(Client):
                 with torch.no_grad():
                     output_ema = self.EMA(inputs) if self.EMA is not None else None
 
-                # Forward pass with main model - extract features
-                # Check if model supports return_feats
-                if hasattr(self.model, 'return_feats') or 'return_feats' in str(type(self.model)):
-                    try:
-                        feats, logits = self.model(inputs, return_feats=True)
-                    except:
-                        # Fallback: use logits as features
-                        logits = self.model(inputs)
-                        feats = logits.detach()
-                else:
-                    logits = self.model(inputs)
-                    feats = logits.detach()
+
+                feats, logits = self.model(inputs, return_feats=True)
 
                 # Get temperature scaling from TempNet
                 tau_temp = self.tempnet(feats.detach())
