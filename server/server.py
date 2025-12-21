@@ -237,7 +237,7 @@ class Server(object):
                 / 2.0
                 * torch.sum(
                     self.server_model_params_list * self.server_model_params_list
-                ).item()
+                )
             )
 
         return total_loss / (i + 1), total_acc / total_num
@@ -397,6 +397,9 @@ class Server(object):
                     lr=self.lr,
                     args=self.args,
                 )
+                # Send EMA model if server has it (for FedGMT/FedGMTT)
+                if hasattr(self, "send_ema_to_client"):
+                    self.send_ema_to_client(_edge_device, client)
                 self.received_vecs = _edge_device.train()
                 self.clients_updated_params_list[client] = self.received_vecs[
                     "local_update_list"

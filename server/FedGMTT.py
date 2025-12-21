@@ -23,7 +23,7 @@ class FedGMTT(Server):
         self.EMA_model = copy.deepcopy(init_model)
         self.dual_variable_list = torch.zeros(
             (args.total_client, init_par_list.shape[0])
-        )
+        ).to(device)
         self.alpha = args.alpha if hasattr(args, "alpha") else 0.1
 
     def process_for_communication(self, client, Averaged_update):
@@ -39,7 +39,14 @@ class FedGMTT(Server):
 
     def postprocess(self, client):
         # Update dual variables
-        self.dual_variable_list[client] += self.received_vecs["local_update_list"]
+        self.dual_variable_list[client] = self.dual_variable_list[
+            client
+        ] + self.received_vecs["local_update_list"].to(self.device)
+
+    def send_ema_to_client(self, _edge_device, client_id):
+        """Send EMA model to client before training"""
+        _edge_device.EMA = copy.deepcopy(self.EMA_model)
+        _edge_device.dual_variable = self.dual_variable_list[client_id].clone()
 
     def global_update(self, selected_clients, Averaged_update, Averaged_model):
         # FedGMT with TempNet (ServerOpt) with EMA model update and dual variable aggregation
